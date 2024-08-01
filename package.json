@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node backend/index.js",
-    "dev": "nodemon backend/index.js"
+    "dev": "nodemon --env-file=.env backend/index.js"
   },
   "type": "module",
   "keywords": [],
