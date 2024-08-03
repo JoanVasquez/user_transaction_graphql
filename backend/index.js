@@ -61,7 +61,7 @@ const server = new ApolloServer({
 await server.start();
 
 app.use(
-  "/",
+  "/graphql",
   expressMiddleware(server, {
     context: async ({ req, res }) => buildContext({ req, res }),
   })
