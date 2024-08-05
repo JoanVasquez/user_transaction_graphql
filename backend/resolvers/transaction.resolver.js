@@ -1,4 +1,5 @@
 import Transaction from "../models/transaction.model.js";
+import User from "../models/user.model.js";
 
 const transactionResolver = {
   Query: {
@@ -21,6 +22,32 @@ const transactionResolver = {
         return transaction;
       } catch (err) {
         console.error(`Error in Transaction: ${err.message}`);
+        throw new Error(err.message || "Internal Server Error");
+      }
+    },
+    categoryStatistics: async (_, __, context) => {
+      if (!context.getUser()) throw new Error("Unauthorized");
+
+      try {
+        const userId = context.getUser()._id;
+        const transactions = await Transaction.find({ userId });
+        const categoryMap = {};
+
+        transactions.forEach((transaction) => {
+          if (!categoryMap[transaction.category]) {
+            categoryMap[transaction.category] = 0;
+          }
+          categoryMap[transaction.category] += transaction.amount;
+        });
+
+        console.log(categoryMap);
+
+        return Object.entries(categoryMap).map(([category, totalAmount]) => ({
+          category,
+          totalAmount,
+        }));
+      } catch (err) {
+        console.error(`Error in CategoryStatistics: ${err.message}`);
         throw new Error(err.message || "Internal Server Error");
       }
     },
@@ -62,6 +89,18 @@ const transactionResolver = {
         return deletedTransaction;
       } catch (err) {
         console.error(`Error in Delete Transaction: ${err.message}`);
+        throw new Error(err.message || "Internal Server Error");
+      }
+    },
+  },
+
+  Transaction: {
+    user: async (parent) => {
+      try {
+        const user = await User.findById(parent.userId);
+        return user;
+      } catch (err) {
+        console.error(`Error in Transaction.user: ${err.message}`);
         throw new Error(err.message || "Internal Server Error");
       }
     },

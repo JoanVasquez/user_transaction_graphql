@@ -1,4 +1,4 @@
-import { users } from "../dummyData/data.js";
+import Transaction from "../models/transaction.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
@@ -97,6 +97,18 @@ const userResolver = {
   },
 
   //TODO: ADD USER/TRANSACTION RELATION
+  User: {
+    transactions: async (parent) => {
+      try {
+        console.log(parent._id);
+        const transactions = await Transaction.find({ userId: parent._id });
+        return transactions;
+      } catch (err) {
+        console.error(`Error in User.transactions: ${err.message}`);
+        throw new Error(err.message || "Internal Server Error");
+      }
+    },
+  },
 };
 
 export default userResolver;
